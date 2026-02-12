@@ -1,0 +1,45 @@
+blog-backend
+├─ pom.xml
+├─ src
+│  ├─ main
+│  │  ├─ java
+│  │  │  └─ com.example.blog
+│  │  │     ├─ BlogApplication.java                        // 启动类
+│  │  │     ├─ config
+│  │  │     │  ├─ SwaggerConfig.java
+│  │  │     │  ├─ RedisConfig.java
+│  │  │     │  └─ MybatisPlusConfig.java
+│  │  │     ├─ controller
+│  │  │     │  ├─ AuthController.java                       // 登录/登出/JWT
+│  │  │     │  ├─ UserController.java
+│  │  │     │  ├─ ArticleController.java
+│  │  │     │  ├─ CategoryController.java
+│  │  │     │  └─ CommentController.java
+│  │  │     ├─ service
+│  │  │     │  ├─ IUserService.java
+│  │  │     │  ├─ IArticleService.java
+│  │  │     │  └─ impl
+│  │  │     │     ├─ UserServiceImpl.java
+│  │  │     │     └─ ArticleServiceImpl.java
+│  │  │     ├─ mapper
+│  │  │     │  ├─ UserMapper.java
+│  │  │     │  ├─ ArticleMapper.java
+│  │  │     │  └─ CommentMapper.java
+│  │  │     ├─ entity
+│  │  │     │  ├─ User.java
+│  │  │     │  ├─ Article.java
+│  │  │     │  ├─ Category.java
+│  │  │     │  └─ Comment.java
+│  │  │     ├─ dto                                       // 请求 DTO（create/update）
+│  │  │     ├─ vo                                        // 返回视图对象
+│  │  │     ├─ util
+│  │  │     │  └─ JwtUtil.java
+│  │  │     └─ common
+│  │  │        ├─ ApiResponse.java                       // 统一返回结果
+│  │  │        ├─ GlobalExceptionHandler.java            // 全局异常处理
+│  │  │        └─ BusinessException.java
+│  │  └─ resources
+│  │     ├─ application.yml
+│  │     └─ mapper                                     // MyBatis-Plus XML（可选）
+│  └─ test
+└─ README.md
