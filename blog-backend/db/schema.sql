@@ -1,17 +1,24 @@
--- 使用 utf8mb4，InnoDB；包括用户、文章、分类、评论表；带审计字段与软删
+-- Safe schema for blog_db: drop tables if they exist and recreate using utf8mb4
+SET FOREIGN_KEY_CHECKS = 0;
+DROP TABLE IF EXISTS `comment`;
+DROP TABLE IF EXISTS `article`;
+DROP TABLE IF EXISTS `category`;
+DROP TABLE IF EXISTS `user`;
+SET FOREIGN_KEY_CHECKS = 1;
+
 CREATE DATABASE IF NOT EXISTS blog_db CHARACTER SET = utf8mb4 COLLATE = utf8mb4_general_ci;
 USE blog_db;
 
 -- 用户表
-CREATE TABLE `user` (
+CREATE TABLE IF NOT EXISTS `user` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `username` VARCHAR(64) NOT NULL UNIQUE,
   `email` VARCHAR(128) DEFAULT NULL,
-  `password` VARCHAR(256) NOT NULL,        -- 存放哈希后的密码
+  `password` VARCHAR(256) NOT NULL,
   `salt` VARCHAR(32) DEFAULT NULL,
   `avatar` VARCHAR(255) DEFAULT NULL,
-  `role` TINYINT NOT NULL DEFAULT 0,       -- 0: 普通用户, 1: 管理员
-  `status` TINYINT NOT NULL DEFAULT 1,     -- 0: 禁用, 1: 正常
+  `role` TINYINT NOT NULL DEFAULT 0,
+  `status` TINYINT NOT NULL DEFAULT 1,
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted` TINYINT NOT NULL DEFAULT 0,
@@ -21,7 +28,7 @@ CREATE TABLE `user` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 分类表
-CREATE TABLE `category` (
+CREATE TABLE IF NOT EXISTS `category` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `name` VARCHAR(64) NOT NULL,
   `slug` VARCHAR(64) DEFAULT NULL,
@@ -34,16 +41,16 @@ CREATE TABLE `category` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 文章表
-CREATE TABLE `article` (
+CREATE TABLE IF NOT EXISTS `article` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `title` VARCHAR(255) NOT NULL,
   `summary` VARCHAR(512) DEFAULT NULL,
   `content` LONGTEXT NOT NULL,
-  `author_id` BIGINT NOT NULL,              -- 关联 user.id
-  `category_id` BIGINT DEFAULT NULL,        -- 关联 category.id
+  `author_id` BIGINT NULL,
+  `category_id` BIGINT NULL,
   `views` INT NOT NULL DEFAULT 0,
   `likes` INT NOT NULL DEFAULT 0,
-  `status` TINYINT NOT NULL DEFAULT 1,      -- 0: 草稿, 1: 已发布
+  `status` TINYINT NOT NULL DEFAULT 1,
   `is_top` TINYINT NOT NULL DEFAULT 0,
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -51,18 +58,18 @@ CREATE TABLE `article` (
   PRIMARY KEY (`id`),
   INDEX (`author_id`),
   INDEX (`category_id`),
-  CONSTRAINT `fk_article_author` FOREIGN KEY (`author_id`) REFERENCES `user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_article_author` FOREIGN KEY (`author_id`) REFERENCES `user` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `fk_article_category` FOREIGN KEY (`category_id`) REFERENCES `category` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 -- 评论表（支持回复：parent_id）
-CREATE TABLE `comment` (
+CREATE TABLE IF NOT EXISTS `comment` (
   `id` BIGINT NOT NULL AUTO_INCREMENT,
   `article_id` BIGINT NOT NULL,
-  `user_id` BIGINT NOT NULL,
-  `parent_id` BIGINT DEFAULT NULL,           -- 回复某条评论
+  `user_id` BIGINT NULL,
+  `parent_id` BIGINT NULL,
   `content` TEXT NOT NULL,
-  `status` TINYINT NOT NULL DEFAULT 1,       -- 0: 隐藏/审核, 1: 可见
+  `status` TINYINT NOT NULL DEFAULT 1,
   `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `deleted` TINYINT NOT NULL DEFAULT 0,
