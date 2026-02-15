@@ -1,6 +1,7 @@
 <template>
   <div class="page">
-    <div class="card">
+    <!-- 应用通用磨砂玻璃组件 -->
+    <GlassSurface class="card" padding="40px" :blur="24" :backgroundOpacity="0.16" :borderOpacity="0.3">
       <h1>登录</h1>
       <form class="form" @submit.prevent="handleSubmit">
         <label>
@@ -15,7 +16,7 @@
       </form>
       <p class="helper">还没有账号？<router-link to="/register">去注册</router-link></p>
       <p v-if="error" class="error">{{ error }}</p>
-    </div>
+    </GlassSurface>
   </div>
 </template>
 
@@ -23,6 +24,7 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { login } from '../utils/api'
+import GlassSurface from '../components/GlassSurface.vue'
 
 const router = useRouter()
 const form = reactive({ username: '', password: '' })
@@ -47,22 +49,20 @@ const handleSubmit = async () => {
 
 <style scoped>
 .page {
-  min-height: 100vh;
+  /* 登录注册页通用样式，居中显示一个卡片 */
+  min-height: 80vh;
+  /*我不理解为什么这里能改高度，下面却不能改宽度呢？这个磨砂毛玻璃 */
+
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 16px;
-  background: #f9fafb;
 }
 
 .card {
   width: 100%;
-  max-width: 420px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
+  max-width: 480px;
   border-radius: 12px;
-  padding: 24px;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.05);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 

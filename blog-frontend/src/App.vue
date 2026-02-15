@@ -1,11 +1,9 @@
 <template>
-  <div id="app">
+  <GlobalGlassLayout>
     <router-view />
-  </div>
+  </GlobalGlassLayout>
 </template>
 
-<script>
-export default {
-  name: 'App'
-}
+<script setup>
+import GlobalGlassLayout from './components/GlobalGlassLayout.vue'
 </script>
