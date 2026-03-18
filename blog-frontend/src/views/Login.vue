@@ -1,5 +1,8 @@
 <template>
   <div class="page">
+    <div class="nav">
+      <router-link class="pill ghost" to="/">返回首页</router-link>
+    </div>
     <!-- 应用通用磨砂玻璃组件 -->
     <GlassSurface class="card" padding="40px" :blur="24" :backgroundOpacity="0.16" :borderOpacity="0.3">
       <h1>登录</h1>
@@ -59,6 +62,13 @@ const handleSubmit = async () => {
   padding: 16px;
 }
 
+.nav {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
 .card {
   width: 100%;
   max-width: 480px;
@@ -113,5 +123,21 @@ button:disabled {
 .error {
   margin-top: 8px;
   color: #b91c1c;
+}
+
+.pill {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.9);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid #111827;
+}
+
+.pill.ghost {
+  background: rgba(255, 255, 255, 0.8);
+  color: #111827;
+  border: 1px solid #111827;
 }
 </style>

@@ -14,7 +14,10 @@ public class CommentController {
     private ICommentService commentService;
 
     @PostMapping
-    public R<Comment> create(@RequestBody Comment comment) {
+    public R<Comment> create(@RequestBody Comment comment,
+                             @RequestHeader(value = "X-User-Id", required = false) Long userId) {
+        // attach userId from header when present so that subsequent permission verification is available
+        if (userId != null) comment.setUserId(userId);
         return R.ok(commentService.create(comment));
     }
 
@@ -25,9 +28,18 @@ public class CommentController {
         return R.ok(commentService.pageByArticle(articleId, page, size));
     }
 
+    @PutMapping("/{id}")
+    public R<Comment> update(@PathVariable Long id,
+                             @RequestBody Comment comment,
+                             @RequestHeader(value = "X-User-Id", required = false) Long userId) {
+        comment.setId(id);
+        return R.ok(commentService.update(comment, userId));
+    }
+
     @DeleteMapping("/{id}")
-    public R<?> delete(@PathVariable Long id) {
-        commentService.delete(id);
+    public R<?> delete(@PathVariable Long id,
+                       @RequestHeader(value = "X-User-Id", required = false) Long userId) {
+        commentService.delete(id, userId);
         return R.ok();
     }
 }

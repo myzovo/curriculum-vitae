@@ -1,5 +1,8 @@
 <template>
   <div class="page">
+    <div class="nav">
+      <router-link class="pill ghost" to="/">返回首页</router-link>
+    </div>
     <header class="top">
       <h1>分类管理</h1>
       <button class="primary" @click="openModal()">新增分类</button>
@@ -125,6 +128,11 @@ onMounted(fetchList)
   gap: 12px;
 }
 
+.nav {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .top {
   display: flex;
   justify-content: space-between;
@@ -185,6 +193,22 @@ onMounted(fetchList)
 .actions .danger {
   color: #b91c1c;
   border-color: #fca5a5;
+}
+
+.pill {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.9);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid #111827;
+}
+
+.pill.ghost {
+  background: rgba(255, 255, 255, 0.8);
+  color: #111827;
+  border: 1px solid #111827;
 }
 
 .state {

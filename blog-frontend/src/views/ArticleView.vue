@@ -1,7 +1,13 @@
 <template>
     <div class="page">
         <header class="top">
-            <button class="back" @click="goBack">返回</button>
+            <div class="top-actions">
+                <button class="back" @click="goBack">返回</button>
+                <button class="pill ghost" @click="goHome">返回首页</button>
+                <button v-if="canDeleteArticle" class="danger" :disabled="articleDeleting" @click="removeArticle">
+                    {{ articleDeleting ? '删除中...' : '删除' }}
+                </button>
+            </div>
             <div class="meta">
                 <span class="cat">{{ article.categoryName || '未分类' }}</span>
                 <span class="dot">•</span>
@@ -22,7 +28,7 @@
                 <textarea v-model="commentText" placeholder="写下你的看法..." rows="3" required></textarea>
                 <div class="form-actions">
                     <button type="submit" :disabled="commentSubmitting">{{ commentSubmitting ? '发布中...' : '发布评论'
-                        }}</button>
+                    }}</button>
                 </div>
             </form>
 
@@ -36,7 +42,30 @@
                             <span class="author">{{ item.user?.username || item.username || '匿名' }}</span>
                             <span class="time">{{ formatDateTime(item.createdAt) }}</span>
                         </div>
-                        <p class="comment-body">{{ item.content }}</p>
+
+                        <div v-if="editingId === item.id" class="edit-box">
+                            <textarea v-model="editText" rows="3" class="comment-input" placeholder="修改评论内容"></textarea>
+                            <div class="comment-actions">
+                                <button type="button" :disabled="commentSaving" @click="saveEdit(item)">
+                                    {{ commentSaving ? '保存中...' : '保存' }}
+                                </button>
+                                <button type="button" class="ghost" :disabled="commentSaving" @click="cancelEdit">
+                                    取消
+                                </button>
+                            </div>
+                        </div>
+
+                        <p v-else class="comment-body">{{ item.content }}</p>
+
+                        <div v-if="canManage(item) && editingId !== item.id" class="comment-actions">
+                            <button type="button" :disabled="commentDeletingId === item.id" @click="startEdit(item)">
+                                编辑
+                            </button>
+                            <button type="button" class="danger" :disabled="commentDeletingId === item.id"
+                                @click="removeComment(item)">
+                                {{ commentDeletingId === item.id ? '删除中...' : '删除' }}
+                            </button>
+                        </div>
                     </div>
                 </div>
 
@@ -52,9 +81,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { getArticle, postComment } from '../utils/api'
+import { getArticle, postComment, updateComment, deleteComment, deleteArticle } from '../utils/api'
 import api from '../utils/api'
 
 const route = useRoute()
@@ -63,6 +92,7 @@ const router = useRouter()
 const article = ref({})
 const articleLoading = ref(false)
 const articleError = ref('')
+const articleDeleting = ref(false)
 
 const commentsList = ref([])
 const commentsTotal = ref(0)
@@ -73,6 +103,11 @@ const commentsLoading = ref(false)
 const commentsError = ref('')
 const commentText = ref('')
 const commentSubmitting = ref(false)
+const currentUser = ref(null)
+const editingId = ref(null)
+const editText = ref('')
+const commentSaving = ref(false)
+const commentDeletingId = ref(null)
 
 const formatDate = val => {
     if (!val) return '未知时间'
@@ -90,6 +125,35 @@ const formatDateTime = val => {
 }
 
 const goBack = () => router.back()
+const goHome = () => router.push('/')
+
+const syncUser = () => {
+    const raw = localStorage.getItem('user')
+    currentUser.value = raw ? JSON.parse(raw) : null
+}
+
+const canDeleteArticle = computed(() => {
+    const user = currentUser.value
+    if (!user) return false
+    const authorId = article.value?.authorId ?? article.value?.userId ?? article.value?.user?.id
+    return Number(user.id) === Number(authorId) || Number(user.role) === 1
+})
+
+const canManage = item => {
+    const user = currentUser.value
+    if (!user || !item) return false
+    const ownerId = item.userId ?? item.user?.id ?? item.user?.userId
+    return Number(user.id) === Number(ownerId) || Number(user.role) === 1
+}
+
+const getErrorMessage = err => {
+    const status = err?.response?.status
+    if (status === 401) return '请先登录后再操作'
+    if (status === 403) return '无权限操作该评论'
+    if (status === 404) return '该评论已被删除'
+    if (status === 500) return '服务器错误，请稍后重试'
+    return err?.message || '操作失败，请稍后重试'
+}
 
 const fetchArticle = async () => {
     articleLoading.value = true
@@ -100,6 +164,24 @@ const fetchArticle = async () => {
         articleError.value = err.message || '文章加载失败'
     } finally {
         articleLoading.value = false
+    }
+}
+
+const removeArticle = async () => {
+    if (!currentUser.value?.id) {
+        alert('请先登录后再操作')
+        return
+    }
+    const ok = window.confirm('确定删除该文章吗？')
+    if (!ok) return
+    articleDeleting.value = true
+    try {
+        await deleteArticle(route.params.id)
+        router.replace('/')
+    } catch (err) {
+        alert(getErrorMessage(err))
+    } finally {
+        articleDeleting.value = false
     }
 }
 
@@ -133,6 +215,10 @@ const fetchComments = async (page = 1) => {
 
 // 提交评论后刷新列表
 const submitComment = async () => {
+    if (!currentUser.value?.id) {
+        alert('请先登录后再操作')
+        return
+    }
     if (!commentText.value.trim()) return
     commentSubmitting.value = true
     try {
@@ -144,9 +230,59 @@ const submitComment = async () => {
         commentText.value = ''
         await fetchComments(commentPage.value)
     } catch (err) {
-        alert(err.message || '评论提交失败')
+        alert(getErrorMessage(err) || '评论提交失败')
     } finally {
         commentSubmitting.value = false
+    }
+}
+
+const startEdit = item => {
+    if (!currentUser.value?.id) {
+        alert('请先登录后再操作')
+        return
+    }
+    editingId.value = item.id
+    editText.value = item.content || ''
+}
+
+const cancelEdit = () => {
+    editingId.value = null
+    editText.value = ''
+}
+
+const saveEdit = async item => {
+    if (!currentUser.value?.id) {
+        alert('请先登录后再操作')
+        return
+    }
+    if (!editText.value.trim()) return
+    commentSaving.value = true
+    try {
+        await updateComment(item.id, { content: editText.value.trim() })
+        cancelEdit()
+        await fetchComments(commentPage.value)
+    } catch (err) {
+        alert(getErrorMessage(err))
+    } finally {
+        commentSaving.value = false
+    }
+}
+
+const removeComment = async item => {
+    if (!currentUser.value?.id) {
+        alert('请先登录后再操作')
+        return
+    }
+    const ok = window.confirm('确定删除该评论吗？')
+    if (!ok) return
+    commentDeletingId.value = item.id
+    try {
+        await deleteComment(item.id)
+        await fetchComments(commentPage.value)
+    } catch (err) {
+        alert(getErrorMessage(err))
+    } finally {
+        commentDeletingId.value = null
     }
 }
 
@@ -158,6 +294,12 @@ const changeCommentPage = p => {
 onMounted(() => {
     fetchArticle()
     fetchComments(1)
+    syncUser()
+    window.addEventListener('storage', syncUser)
+})
+
+onUnmounted(() => {
+    window.removeEventListener('storage', syncUser)
 })
 </script>
 
@@ -177,6 +319,13 @@ onMounted(() => {
     gap: 8px;
 }
 
+.top-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
 .back {
     align-self: flex-start;
     padding: 6px 10px;
@@ -184,6 +333,36 @@ onMounted(() => {
     border-radius: 8px;
     background: #fff;
     cursor: pointer;
+}
+
+.pill {
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: rgba(17, 24, 39, 0.9);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    border: 1px solid #111827;
+}
+
+.pill.ghost {
+    background: rgba(255, 255, 255, 0.8);
+    color: #111827;
+    border: 1px solid #111827;
+}
+
+.danger {
+    padding: 6px 10px;
+    border: 1px solid #111827;
+    border-radius: 8px;
+    background: #111827;
+    color: #fff;
+    cursor: pointer;
+}
+
+.danger:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
 }
 
 .meta {
@@ -227,6 +406,46 @@ onMounted(() => {
 }
 
 .comment-form textarea {
+    width: 100%;
+    resize: vertical;
+    padding: 8px;
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+}
+
+.comment-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 8px;
+}
+
+.comment-actions button {
+    padding: 8px 12px;
+    border-radius: 8px;
+    border: 1px solid #111827;
+    background: #111827;
+    color: #fff;
+    cursor: pointer;
+}
+
+.comment-actions button.ghost {
+    background: rgba(255, 255, 255, 0.8);
+    color: #111827;
+}
+
+.comment-actions button.danger {
+    border-color: #111827;
+    background: #111827;
+    color: #fff;
+}
+
+.comment-actions button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.comment-input {
     width: 100%;
     resize: vertical;
     padding: 8px;

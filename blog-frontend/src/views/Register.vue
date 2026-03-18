@@ -1,5 +1,8 @@
 <template>
   <div class="auth">
+    <div class="nav">
+      <router-link class="pill ghost" to="/">返回首页</router-link>
+    </div>
     <h1>注册</h1>
     <form class="form" @submit.prevent="handleSubmit">
       <label>
@@ -57,6 +60,12 @@ const handleSubmit = async () => {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
+.nav {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
 h1 { margin: 0 0 16px; }
 
 .form {
@@ -102,5 +111,21 @@ button:disabled {
 .error {
   color: #b91c1c;
   font-size: 13px;
+}
+
+.pill {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.9);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid #111827;
+}
+
+.pill.ghost {
+  background: rgba(255, 255, 255, 0.8);
+  color: #111827;
+  border: 1px solid #111827;
 }
 </style>

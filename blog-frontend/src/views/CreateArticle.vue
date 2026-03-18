@@ -1,5 +1,8 @@
 <template>
   <div class="page">
+    <div class="nav">
+      <router-link class="pill ghost" to="/">返回首页</router-link>
+    </div>
     <h1>创建文章</h1>
     <form class="form" @submit.prevent="handleSubmit">
       <label>
@@ -93,6 +96,11 @@ onMounted(() => {
   gap: 12px;
 }
 
+.nav {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .form {
   display: flex;
   flex-direction: column;
@@ -137,5 +145,21 @@ button:disabled {
 
 .error {
   color: #b91c1c;
+}
+
+.pill {
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(17, 24, 39, 0.9);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 600;
+  border: 1px solid #111827;
+}
+
+.pill.ghost {
+  background: rgba(255, 255, 255, 0.8);
+  color: #111827;
+  border: 1px solid #111827;
 }
 </style>

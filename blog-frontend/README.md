@@ -15,3 +15,5 @@ Notes:
   - `/` Article list (src/views/Home.vue)
   - `/article/:id` Article detail (src/views/ArticleView.vue)
 
+后端：mvn -pl blog-backend spring-boot:run
+前端：npm run dev

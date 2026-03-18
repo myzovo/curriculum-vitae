@@ -14,6 +14,7 @@ public class Article {
 	private String title;
 	private String content;
 	private Long categoryId;
+	private Long authorId;
 	private Integer isTop; // 1: 置顶
 	private Integer deleted; // 0: 未删除, 1: 已删除
 	private Integer views; // 新增：阅读量
@@ -31,6 +32,9 @@ public class Article {
 
 	public Long getCategoryId() { return categoryId; }
 	public void setCategoryId(Long categoryId) { this.categoryId = categoryId; }
+
+	public Long getAuthorId() { return authorId; }
+	public void setAuthorId(Long authorId) { this.authorId = authorId; }
 
 	public Integer getIsTop() { return isTop; }
 	public void setIsTop(Integer isTop) { this.isTop = isTop; }

@@ -1,6 +1,7 @@
 package com.example.blog.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.blog.common.R;
 import com.example.blog.entity.Article;
 import com.example.blog.service.IArticleService;
 import org.springframework.web.bind.annotation.*;
@@ -26,8 +27,10 @@ public class ArticleController {
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Long id) {
-        articleService.delete(id);
+    public R<?> delete(@PathVariable Long id,
+                       @RequestHeader(value = "X-User-Id", required = false) Long userId) {
+        articleService.delete(id, userId);
+        return R.ok();
     }
 
     @GetMapping("/{id}")

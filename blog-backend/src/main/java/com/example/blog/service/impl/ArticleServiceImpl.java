@@ -3,8 +3,11 @@ package com.example.blog.service.impl;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.blog.common.BusinessException;
 import com.example.blog.entity.Article;
+import com.example.blog.entity.User;
 import com.example.blog.mapper.ArticleMapper;
+import com.example.blog.mapper.UserMapper;
 import com.example.blog.service.IArticleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,6 +20,8 @@ import java.time.LocalDateTime;
 public class ArticleServiceImpl implements IArticleService {
 	@Autowired
 	private ArticleMapper articleMapper;
+	@Autowired
+	private UserMapper userMapper;
 
 	// 注：原实现引用了 ArticleCacheService（缓存相关），该类在当前工作集未提供。
 	// 为保证可编译运行，已移除对缓存服务的依赖。后续如添加缓存实现，可恢复相关调用。
@@ -43,9 +48,26 @@ public class ArticleServiceImpl implements IArticleService {
 	}
 
 	@Override
-	public void delete(Long id) {
+	public void delete(Long id, Long operatorId) {
 		if (id == null) return;
+		Article existing = articleMapper.selectById(id);
+		if (existing == null) {
+			throw new BusinessException(404, "文章不存在");
+		}
+		assertPermission(existing, operatorId);
 		articleMapper.deleteById(id);
+	}
+
+	// Permission: author or admin (role=1)
+	private void assertPermission(Article existing, Long operatorId) {
+		if (operatorId == null) {
+			throw new BusinessException(401, "未登录，无法操作文章");
+		}
+		Long ownerId = existing.getAuthorId();
+		if (ownerId != null && ownerId.equals(operatorId)) return;
+		User op = userMapper.selectById(operatorId);
+		if (op != null && op.getRole() != null && op.getRole() == 1) return;
+		throw new BusinessException(403, "无权限操作他人文章");
 	}
 
 	@Override
@@ -87,9 +109,6 @@ public class ArticleServiceImpl implements IArticleService {
 	public boolean removeById(Long id) {
 		if (id == null) return false;
 		int rows = articleMapper.deleteById(id);
-		if (rows > 0) {
-			return true;
-		}
-		return false;
+		return rows > 0;
 	}
 }

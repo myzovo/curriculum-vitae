@@ -6,7 +6,7 @@ import com.example.blog.entity.Article;
 public interface IArticleService {
 	Article create(Article article);
 	Article update(Article article);
-	void delete(Long id);
+	void delete(Long id, Long operatorId);
 	Article getById(Long id);
 	Page<Article> page(int pageNum, int pageSize);
 	Page<Article> pageByCategory(int pageNum, int pageSize, Long categoryId);
