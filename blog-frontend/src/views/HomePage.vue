@@ -154,7 +154,7 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 0;
+  z-index: 1;
 }
 
 .hero-vignette {
@@ -163,7 +163,7 @@ onUnmounted(() => {
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: 0;
+  z-index: 2;
   background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.3) 60%, rgba(0, 0, 0, 0.8) 100%);
   pointer-events: none;
 }
@@ -171,7 +171,8 @@ onUnmounted(() => {
 .hero-content {
   max-width: 720px;
   position: relative;
-  z-index: 1;
+  z-index: 3;
+  pointer-events: none;
 }
 
 .hero-eyebrow {
@@ -263,6 +264,7 @@ onUnmounted(() => {
   gap: 16px;
   justify-content: center;
   animation: fadeInUp 0.6s var(--transition) 0.3s both;
+  pointer-events: auto;
 }
 
 .btn-primary {
@@ -326,11 +328,12 @@ onUnmounted(() => {
 .scroll-indicator {
   position: absolute;
   bottom: 40px;
-  z-index: 1;
+  z-index: 3;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0;
+  pointer-events: none;
 }
 
 .arrow {
