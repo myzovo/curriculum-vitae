@@ -12,12 +12,15 @@ public class Article {
 	@TableId(type = IdType.AUTO)
 	private Long id;
 	private String title;
+	private String summary;
 	private String content;
 	private Long categoryId;
 	private Long authorId;
 	private Integer isTop; // 1: 置顶
 	private Integer deleted; // 0: 未删除, 1: 已删除
-	private Integer views; // 新增：阅读量
+	private Integer views;
+	private Integer likes;
+	private Integer status; // 0: 草稿, 1: 已发布
 	private LocalDateTime createdAt;
 	private LocalDateTime updatedAt;
 
@@ -26,6 +29,9 @@ public class Article {
 
 	public String getTitle() { return title; }
 	public void setTitle(String title) { this.title = title; }
+
+	public String getSummary() { return summary; }
+	public void setSummary(String summary) { this.summary = summary; }
 
 	public String getContent() { return content; }
 	public void setContent(String content) { this.content = content; }
@@ -44,6 +50,12 @@ public class Article {
 
 	public Integer getViews() { return views; }
 	public void setViews(Integer views) { this.views = views; }
+
+	public Integer getLikes() { return likes; }
+	public void setLikes(Integer likes) { this.likes = likes; }
+
+	public Integer getStatus() { return status; }
+	public void setStatus(Integer status) { this.status = status; }
 
 	public LocalDateTime getCreatedAt() { return createdAt; }
 	public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }

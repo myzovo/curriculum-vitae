@@ -1,26 +1,27 @@
 <template>
-  <div class="auth">
-    <div class="nav">
-      <router-link class="pill ghost" to="/">返回首页</router-link>
+  <div class="auth-page">
+    <div class="auth-card">
+      <h1 class="auth-title">注册</h1>
+      <form class="auth-form" @submit.prevent="handleSubmit">
+        <label class="form-label">
+          <span>用户名</span>
+          <input v-model="form.username" required placeholder="请输入用户名" />
+        </label>
+        <label class="form-label">
+          <span>邮箱</span>
+          <input v-model="form.email" type="email" required placeholder="请输入邮箱" />
+        </label>
+        <label class="form-label">
+          <span>密码</span>
+          <input v-model="form.password" type="password" required placeholder="请输入密码" />
+        </label>
+        <button type="submit" class="submit-btn" :disabled="loading">
+          {{ loading ? '注册中...' : '注册' }}
+        </button>
+      </form>
+      <p class="auth-link">已有账号？<router-link to="/login">去登录</router-link></p>
+      <p v-if="error" class="auth-error">{{ error }}</p>
     </div>
-    <h1>注册</h1>
-    <form class="form" @submit.prevent="handleSubmit">
-      <label>
-        用户名
-        <input v-model="form.username" required placeholder="请输入用户名" />
-      </label>
-      <label>
-        邮箱
-        <input v-model="form.email" type="email" required placeholder="请输入邮箱" />
-      </label>
-      <label>
-        密码
-        <input v-model="form.password" type="password" required placeholder="请输入密码" />
-      </label>
-      <button type="submit" :disabled="loading">{{ loading ? '注册中...' : '注册' }}</button>
-      <p class="tip">已有账号？<router-link to="/login">去登录</router-link></p>
-      <p v-if="error" class="error">{{ error }}</p>
-    </form>
   </div>
 </template>
 
@@ -50,82 +51,122 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.auth {
-  max-width: 400px;
-  margin: 60px auto;
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 24px;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  background: #fff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  padding-top: var(--header-height);
 }
 
-.nav {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 12px;
+.auth-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  padding: 48px 40px;
+  animation: fadeInUp 0.5s var(--transition) both;
 }
 
-h1 { margin: 0 0 16px; }
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-label {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 14px;
-  color: #374151;
-}
-
-input {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #d1d5db;
-}
-
-button {
-  padding: 10px;
-  border-radius: 8px;
-  border: 1px solid #111827;
-  background: #111827;
+.auth-title {
+  font-size: 32px;
+  font-weight: 600;
   color: #fff;
-  cursor: pointer;
+  margin-bottom: 32px;
+  letter-spacing: -0.01em;
 }
 
-button:disabled {
-  opacity: 0.6;
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: hsla(0, 0%, 100%, 0.75);
+}
+
+.form-label input {
+  padding: 12px 16px;
+  background: #1a1a1a;
+  border: 1px solid hsla(0, 0%, 100%, 0.15);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 15px;
+  font-family: var(--font-primary);
+  outline: none;
+  transition: border-color 0.3s var(--transition);
+}
+
+.form-label input:focus {
+  border-color: hsla(0, 0%, 100%, 0.4);
+}
+
+.form-label input::placeholder {
+  color: hsla(0, 0%, 100%, 0.25);
+}
+
+.submit-btn {
+  padding: 14px;
+  background: #fff;
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-primary);
+  cursor: pointer;
+  transition: all 0.3s var(--transition);
+  margin-top: 8px;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: hsla(0, 0%, 100%, 0.9);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-.tip {
-  margin: 0;
-  color: #6b7280;
-  font-size: 13px;
+.auth-link {
+  margin-top: 24px;
+  font-size: 14px;
+  color: hsla(0, 0%, 100%, 0.55);
+  text-align: center;
 }
 
-.error {
-  color: #b91c1c;
-  font-size: 13px;
-}
-
-.pill {
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: rgba(17, 24, 39, 0.9);
-  color: #fff;
-  text-decoration: none;
+.auth-link a {
+  color: var(--color-accent);
   font-weight: 600;
-  border: 1px solid #111827;
+  text-decoration: none;
 }
 
-.pill.ghost {
-  background: rgba(255, 255, 255, 0.8);
-  color: #111827;
-  border: 1px solid #111827;
+.auth-link a:hover {
+  text-decoration: underline;
+}
+
+.auth-error {
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--color-danger);
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 32px 24px;
+  }
+
+  .auth-title {
+    font-size: 28px;
+  }
 }
 </style>

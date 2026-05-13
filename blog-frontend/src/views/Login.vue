@@ -1,25 +1,23 @@
 <template>
-  <div class="page">
-    <div class="nav">
-      <router-link class="pill ghost" to="/">返回首页</router-link>
-    </div>
-    <!-- 应用通用磨砂玻璃组件 -->
-    <GlassSurface class="card" padding="40px" :blur="24" :backgroundOpacity="0.16" :borderOpacity="0.3">
-      <h1>登录</h1>
-      <form class="form" @submit.prevent="handleSubmit">
-        <label>
+  <div class="auth-page">
+    <div class="auth-card">
+      <h1 class="auth-title">登录</h1>
+      <form class="auth-form" @submit.prevent="handleSubmit">
+        <label class="form-label">
           <span>用户名</span>
           <input v-model="form.username" required placeholder="请输入用户名" />
         </label>
-        <label>
+        <label class="form-label">
           <span>密码</span>
           <input v-model="form.password" type="password" required placeholder="请输入密码" />
         </label>
-        <button type="submit" :disabled="loading">{{ loading ? '登录中...' : '登录' }}</button>
+        <button type="submit" class="submit-btn" :disabled="loading">
+          {{ loading ? '登录中...' : '登录' }}
+        </button>
       </form>
-      <p class="helper">还没有账号？<router-link to="/register">去注册</router-link></p>
-      <p v-if="error" class="error">{{ error }}</p>
-    </GlassSurface>
+      <p class="auth-link">还没有账号？<router-link to="/register">去注册</router-link></p>
+      <p v-if="error" class="auth-error">{{ error }}</p>
+    </div>
   </div>
 </template>
 
@@ -27,7 +25,6 @@
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { login } from '../utils/api'
-import GlassSurface from '../components/GlassSurface.vue'
 
 const router = useRouter()
 const form = reactive({ username: '', password: '' })
@@ -51,93 +48,122 @@ const handleSubmit = async () => {
 </script>
 
 <style scoped>
-.page {
-  /* 登录注册页通用样式，居中显示一个卡片 */
-  min-height: 80vh;
-  /*我不理解为什么这里能改高度，下面却不能改宽度呢？这个磨砂毛玻璃 */
-
+.auth-page {
+  min-height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 24px;
+  padding-top: var(--header-height);
 }
 
-.nav {
+.auth-card {
   width: 100%;
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 12px;
-}
-
-.card {
-  width: 100%;
-  max-width: 480px;
+  max-width: 420px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  padding: 48px 40px;
+  animation: fadeInUp 0.5s var(--transition) both;
 }
 
-h1 {
-  margin: 0 0 16px;
-  font-size: 24px;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-label {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  font-size: 14px;
-}
-
-input {
-  padding: 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-}
-
-button {
-  padding: 10px;
-  border: none;
-  border-radius: 8px;
-  background: #111827;
+.auth-title {
+  font-size: 32px;
+  font-weight: 600;
   color: #fff;
-  cursor: pointer;
+  margin-bottom: 32px;
+  letter-spacing: -0.01em;
 }
 
-button:disabled {
-  opacity: 0.6;
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-label {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  color: hsla(0, 0%, 100%, 0.75);
+}
+
+.form-label input {
+  padding: 12px 16px;
+  background: #1a1a1a;
+  border: 1px solid hsla(0, 0%, 100%, 0.15);
+  border-radius: 4px;
+  color: #fff;
+  font-size: 15px;
+  font-family: var(--font-primary);
+  outline: none;
+  transition: border-color 0.3s var(--transition);
+}
+
+.form-label input:focus {
+  border-color: hsla(0, 0%, 100%, 0.4);
+}
+
+.form-label input::placeholder {
+  color: hsla(0, 0%, 100%, 0.25);
+}
+
+.submit-btn {
+  padding: 14px;
+  background: #fff;
+  color: #000;
+  border: none;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  font-family: var(--font-primary);
+  cursor: pointer;
+  transition: all 0.3s var(--transition);
+  margin-top: 8px;
+}
+
+.submit-btn:hover:not(:disabled) {
+  background: hsla(0, 0%, 100%, 0.9);
+}
+
+.submit-btn:disabled {
+  opacity: 0.5;
   cursor: not-allowed;
 }
 
-.helper {
-  margin: 12px 0 0;
-  color: #6b7280;
+.auth-link {
+  margin-top: 24px;
   font-size: 14px;
+  color: hsla(0, 0%, 100%, 0.55);
+  text-align: center;
 }
 
-.error {
-  margin-top: 8px;
-  color: #b91c1c;
-}
-
-.pill {
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: rgba(17, 24, 39, 0.9);
-  color: #fff;
-  text-decoration: none;
+.auth-link a {
+  color: var(--color-accent);
   font-weight: 600;
-  border: 1px solid #111827;
+  text-decoration: none;
 }
 
-.pill.ghost {
-  background: rgba(255, 255, 255, 0.8);
-  color: #111827;
-  border: 1px solid #111827;
+.auth-link a:hover {
+  text-decoration: underline;
+}
+
+.auth-error {
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--color-danger);
+  text-align: center;
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 32px 24px;
+  }
+
+  .auth-title {
+    font-size: 28px;
+  }
 }
 </style>

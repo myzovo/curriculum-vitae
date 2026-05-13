@@ -23,9 +23,6 @@ public class ArticleServiceImpl implements IArticleService {
 	@Autowired
 	private UserMapper userMapper;
 
-	// 注：原实现引用了 ArticleCacheService（缓存相关），该类在当前工作集未提供。
-	// 为保证可编译运行，已移除对缓存服务的依赖。后续如添加缓存实现，可恢复相关调用。
-
 	@Override
 	public Article create(Article article) {
 		if (article == null) throw new IllegalArgumentException("article is null");
