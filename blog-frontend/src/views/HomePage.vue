@@ -110,22 +110,25 @@
     </section>
 
     <section class="contact" ref="contactRef">
-      <h2 class="section-title" :class="{ visible: contactVisible }">联系方式</h2>
-      <p class="section-subtitle" :class="{ visible: contactVisible }">期待与你交流</p>
-      <div class="contact-links">
-        <a
-          v-for="(link, i) in contactLinks"
-          :key="link.label"
-          :href="link.href"
-          target="_blank"
-          rel="noreferrer"
-          class="contact-item"
-          :class="{ visible: contactVisible }"
-          :style="{ transitionDelay: `${i * 100}ms` }"
-        >
-          <span class="contact-icon">{{ link.icon }}</span>
-          <span class="contact-label">{{ link.label }}</span>
-        </a>
+      <canvas ref="contactCanvas" class="contact-canvas"></canvas>
+      <div class="contact-inner">
+        <h2 class="section-title" :class="{ visible: contactVisible }">联系方式</h2>
+        <p class="section-subtitle" :class="{ visible: contactVisible }">期待与你交流</p>
+        <div class="contact-links">
+          <a
+            v-for="(link, i) in contactLinks"
+            :key="link.label"
+            :href="link.href"
+            target="_blank"
+            rel="noreferrer"
+            class="contact-item"
+            :class="{ visible: contactVisible }"
+            :style="{ transitionDelay: `${i * 100}ms` }"
+          >
+            <span class="contact-icon">{{ link.icon }}</span>
+            <span class="contact-label">{{ link.label }}</span>
+          </a>
+        </div>
       </div>
     </section>
   </div>
@@ -134,17 +137,20 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useSnakeGrid } from '@/composables/useSnakeGrid'
+import { useFluidBackground } from '@/composables/useFluidBackground'
 
 const aboutRef = ref(null)
 const contactRef = ref(null)
 const aboutVisible = ref(false)
 const contactVisible = ref(false)
 const gridCanvas = ref(null)
+const contactCanvas = ref(null)
 const heroNameRef = ref(null)
 const heroBioRef = ref(null)
 
 let observer = null
 let snake = null
+let fluid = null
 
 const bioText = '欢迎，这是个记录折腾过程的地方'
 const bioChars = computed(() => [...bioText])
@@ -179,6 +185,12 @@ onMounted(() => {
     snake.init(gridCanvas.value)
   }
 
+  // Init fluid background for contact section
+  if (contactCanvas.value) {
+    fluid = useFluidBackground()
+    fluid.init(contactCanvas.value)
+  }
+
   observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -199,6 +211,7 @@ onMounted(() => {
 onUnmounted(() => {
   if (observer) observer.disconnect()
   if (snake) snake.destroy()
+  if (fluid) fluid.destroy()
 })
 </script>
 
@@ -490,13 +503,35 @@ onUnmounted(() => {
 .contact {
   height: 100vh;
   scroll-snap-align: start;
+  position: relative;
+  overflow: hidden;
+}
+
+.contact-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.contact-inner {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 100px 24px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  height: 100%;
   position: relative;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.contact-inner a,
+.contact-inner .contact-item {
+  pointer-events: auto;
 }
 
 .contact::before {
