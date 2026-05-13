@@ -1,7 +1,7 @@
 <template>
   <div class="home-page">
     <section class="hero">
-      <canvas ref="fluidCanvas" class="fluid-canvas"></canvas>
+      <canvas ref="gridCanvas" class="fluid-canvas"></canvas>
       <div class="hero-vignette"></div>
       <div class="hero-content">
         <p class="hero-eyebrow">全栈开发者 / AI 爱好者</p>
@@ -64,18 +64,18 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { useFluidBackground } from '@/composables/useFluidBackground'
+import { useSnakeGrid } from '@/composables/useSnakeGrid'
 
 const aboutRef = ref(null)
 const contactRef = ref(null)
 const aboutVisible = ref(false)
 const contactVisible = ref(false)
-const fluidCanvas = ref(null)
+const gridCanvas = ref(null)
 const heroNameRef = ref(null)
 const heroBioRef = ref(null)
 
 let observer = null
-let fluid = null
+let snake = null
 
 const bioText = '热爱技术，专注于构建高质量的全栈应用。探索 AI、RAG、云原生等前沿技术，用代码创造价值。'
 const bioChars = computed(() => [...bioText])
@@ -98,10 +98,10 @@ const contactLinks = [
 ]
 
 onMounted(() => {
-  // Init WebGL fluid background
-  if (fluidCanvas.value) {
-    fluid = useFluidBackground()
-    fluid.init(fluidCanvas.value)
+  // Init snake grid background
+  if (gridCanvas.value) {
+    snake = useSnakeGrid()
+    snake.init(gridCanvas.value)
   }
 
   observer = new IntersectionObserver(
@@ -123,7 +123,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (observer) observer.disconnect()
-  if (fluid) fluid.destroy()
+  if (snake) snake.destroy()
 })
 </script>
 
