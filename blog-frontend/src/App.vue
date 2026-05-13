@@ -198,11 +198,33 @@ a {
 }
 
 .page-enter-active {
-  animation: fadeInUp 0.3s var(--transition) both;
+  animation: pageEnter 0.4s var(--transition) both;
 }
 
 .page-leave-active {
-  animation: opacityIn 0.15s var(--transition) reverse both;
+  animation: pageLeave 0.25s var(--transition) both;
+}
+
+@keyframes pageEnter {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes pageLeave {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-15px) scale(0.99);
+  }
 }
 </style>
 

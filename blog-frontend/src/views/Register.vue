@@ -1,5 +1,6 @@
 <template>
   <div class="auth-page">
+    <GridCanvas :speed="0.1" :squareSize="80" borderColor="rgba(255, 255, 255, 0.02)" />
     <div class="auth-card">
       <h1 class="auth-title">注册</h1>
       <form class="auth-form" @submit.prevent="handleSubmit">
@@ -28,6 +29,7 @@
 <script setup>
 import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import GridCanvas from '../components/GridCanvas.vue'
 import { register } from '../utils/api'
 
 const router = useRouter()
@@ -63,11 +65,14 @@ const handleSubmit = async () => {
 .auth-card {
   width: 100%;
   max-width: 420px;
-  background: var(--color-surface);
+  background: rgba(13, 13, 13, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
   border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 48px 40px;
   animation: fadeInUp 0.5s var(--transition) both;
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.5);
 }
 
 .auth-title {

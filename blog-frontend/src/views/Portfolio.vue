@@ -1,5 +1,6 @@
 <template>
   <div class="portfolio-page">
+    <GridCanvas :speed="0.1" :squareSize="70" borderColor="rgba(255, 255, 255, 0.025)" />
     <section class="portfolio-hero">
       <h1 class="portfolio-title">作品集</h1>
       <p class="portfolio-subtitle">探索我的项目</p>
@@ -44,6 +45,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
+import GridCanvas from '../components/GridCanvas.vue'
 
 const projects = [
   {
@@ -156,6 +158,10 @@ onUnmounted(() => {
   color: #fff;
   letter-spacing: -0.02em;
   line-height: 1.2;
+  background: linear-gradient(135deg, #fff 0%, hsla(0, 0%, 100%, 0.7) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
   margin-bottom: 12px;
 }
 
@@ -192,7 +198,7 @@ onUnmounted(() => {
 
 .project-card:hover {
   border-color: hsla(0, 0%, 100%, 0.25);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .project-card:hover .card-visual {

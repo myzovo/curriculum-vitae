@@ -1,5 +1,6 @@
 <template>
   <div class="blog-page">
+    <GridCanvas :speed="0.15" :squareSize="80" borderColor="rgba(255, 255, 255, 0.02)" />
     <div class="blog-header">
       <h1 class="page-title">博客文章</h1>
       <p class="page-subtitle">探索技术、思考与分享</p>
@@ -66,6 +67,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { getArticlesPage } from '../utils/api'
+import GridCanvas from '../components/GridCanvas.vue'
 
 const articles = ref([])
 const page = ref(1)
@@ -113,6 +115,8 @@ onMounted(() => fetchPage(1))
 
 .blog-header {
   margin-bottom: 48px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid hsla(0, 0%, 100%, 0.06);
 }
 
 .page-title {
@@ -121,6 +125,10 @@ onMounted(() => fetchPage(1))
   color: #fff;
   letter-spacing: -0.02em;
   margin-bottom: 8px;
+  background: linear-gradient(135deg, #fff 0%, hsla(0, 0%, 100%, 0.7) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .page-subtitle {
@@ -147,6 +155,7 @@ onMounted(() => fetchPage(1))
 .article-card:hover {
   border-color: var(--color-border-hover);
   transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .card-meta {

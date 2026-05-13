@@ -1,5 +1,6 @@
 <template>
   <div class="article-page">
+    <GridCanvas :speed="0.08" :squareSize="100" borderColor="rgba(255, 255, 255, 0.015)" />
     <div class="article-nav">
       <router-link class="back-link" to="/blog">← 返回博客</router-link>
       <button
@@ -35,6 +36,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { getArticle, deleteArticle } from '../utils/api'
+import GridCanvas from '../components/GridCanvas.vue'
 
 const route = useRoute()
 const router = useRouter()

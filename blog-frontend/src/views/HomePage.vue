@@ -1,19 +1,24 @@
 <template>
   <div class="home-page">
     <section class="hero">
+      <canvas ref="fluidCanvas" class="fluid-canvas"></canvas>
+      <div class="hero-vignette"></div>
       <div class="hero-content">
         <p class="hero-eyebrow">全栈开发者 / AI 爱好者</p>
-        <h1 class="hero-name">FeiTwnd</h1>
-        <p class="hero-bio">热爱技术，专注于构建高质量的全栈应用。探索 AI、RAG、云原生等前沿技术，用代码创造价值。</p>
+        <h1 class="hero-name" ref="heroNameRef">
+          <span v-for="(char, i) in nameChars" :key="i" class="name-char" :style="{ animationDelay: `${i * 0.08}s` }">{{ char }}</span>
+        </h1>
+        <p class="hero-bio" ref="heroBioRef">
+          <span v-for="(char, i) in bioChars" :key="i" class="bio-char" :style="{ animationDelay: `${i * 0.04}s` }">{{ char }}</span>
+        </p>
         <div class="hero-actions">
-          <router-link class="btn-primary" to="/portfolio">查看作品</router-link>
+          <router-link class="btn-primary shimmer-btn" to="/portfolio">查看作品</router-link>
           <router-link class="btn-secondary" to="/blog">阅读博客</router-link>
         </div>
       </div>
       <div class="scroll-indicator">
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-          <path d="M12 5v14M19 12l-7 7-7-7"/>
-        </svg>
+        <div class="arrow arrow-1"></div>
+        <div class="arrow arrow-2"></div>
       </div>
     </section>
 
@@ -58,14 +63,23 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useFluidBackground } from '@/composables/useFluidBackground'
 
 const aboutRef = ref(null)
 const contactRef = ref(null)
 const aboutVisible = ref(false)
 const contactVisible = ref(false)
+const fluidCanvas = ref(null)
+const heroNameRef = ref(null)
+const heroBioRef = ref(null)
 
 let observer = null
+let fluid = null
+
+const bioText = '热爱技术，专注于构建高质量的全栈应用。探索 AI、RAG、云原生等前沿技术，用代码创造价值。'
+const bioChars = computed(() => [...bioText])
+const nameChars = computed(() => [...'FeiTwnd'])
 
 const skills = [
   { icon: 'S', name: 'Spring Boot', desc: '企业级 Java 后端框架' },
@@ -86,6 +100,12 @@ const contactLinks = [
 ]
 
 onMounted(() => {
+  // Init WebGL fluid background
+  if (fluidCanvas.value) {
+    fluid = useFluidBackground()
+    fluid.init(fluidCanvas.value)
+  }
+
   observer = new IntersectionObserver(
     (entries) => {
       entries.forEach((entry) => {
@@ -105,6 +125,7 @@ onMounted(() => {
 
 onUnmounted(() => {
   if (observer) observer.disconnect()
+  if (fluid) fluid.destroy()
 })
 </script>
 
@@ -126,10 +147,33 @@ onUnmounted(() => {
   text-align: center;
   padding: 0 24px;
   position: relative;
+  overflow: hidden;
+}
+
+.fluid-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+.hero-vignette {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.3) 60%, rgba(0, 0, 0, 0.8) 100%);
+  pointer-events: none;
 }
 
 .hero-content {
   max-width: 720px;
+  position: relative;
+  z-index: 1;
 }
 
 .hero-eyebrow {
@@ -148,7 +192,40 @@ onUnmounted(() => {
   letter-spacing: -0.02em;
   line-height: 1.1;
   margin-bottom: 24px;
-  animation: fadeInUp 0.6s var(--transition) 0.1s both;
+  text-shadow: rgb(69, 45, 45) 0 0 1px, rgb(255, 255, 251) 0 0 1px, rgb(255, 255, 251) 0 0 2px;
+}
+
+.name-char {
+  display: inline-block;
+  animation: nameGlow 1s ease both, whiteShadow 1.5s ease-in-out infinite alternate;
+  animation-delay: var(--delay, 0s), 0s;
+}
+
+@keyframes nameGlow {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(0);
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.9), 0 0 60px rgba(255, 255, 255, 0.3);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px #333;
+  }
+}
+
+@keyframes whiteShadow {
+  from {
+    text-shadow: 0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff, 0 0 5px #333, 0 0 8px #333, 0 0 9px #333, 0 0 10px #333, 0 0 15px #333;
+  }
+  to {
+    text-shadow: 0 0 0.5px #fff, 0 0 1px #fff, 0 0 1.5px #fff, 0 0 2px #333, 0 0 4px #333, 0 0 5px #333, 0 0 6px #333, 0 0 8px #333;
+  }
 }
 
 .hero-bio {
@@ -158,6 +235,29 @@ onUnmounted(() => {
   max-width: 540px;
   margin: 0 auto 40px;
   animation: fadeInUp 0.6s var(--transition) 0.2s both;
+}
+
+.bio-char {
+  display: inline;
+  animation: letterGlow 0.7s ease both;
+}
+
+@keyframes letterGlow {
+  0% {
+    opacity: 0;
+    text-shadow: 0 0 1px rgba(255, 255, 255, 0.1);
+  }
+  66% {
+    opacity: 1;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.9);
+  }
+  77% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  }
 }
 
 .hero-actions {
@@ -178,11 +278,33 @@ onUnmounted(() => {
   font-family: var(--font-primary);
   text-decoration: none;
   transition: all 0.3s var(--transition);
+  position: relative;
+  overflow: hidden;
 }
 
 .btn-primary:hover {
   background: hsla(0, 0%, 100%, 0.9);
   transform: translateY(-1px);
+}
+
+.shimmer-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: shimmer 2s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
 }
 
 .btn-secondary {
@@ -206,11 +328,89 @@ onUnmounted(() => {
 .scroll-indicator {
   position: absolute;
   bottom: 40px;
-  color: hsla(0, 0%, 100%, 0.3);
-  animation: bounceArrow 2s var(--transition) infinite;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
 }
 
-.about,
+.arrow {
+  width: 20px;
+  height: 20px;
+  position: relative;
+}
+
+.arrow::before,
+.arrow::after {
+  content: '';
+  display: block;
+  height: 2px;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  background: #fff;
+  box-shadow: 1px 1px 20px 0px rgba(255, 255, 255, 0.5);
+  width: 13px;
+}
+
+.arrow::before {
+  transform: translate(-50%, -50%) rotate(45deg) translateX(-10%);
+  transform-origin: top left;
+}
+
+.arrow::after {
+  transform: translate(-50%, -50%) rotate(-45deg) translateX(10%);
+  transform-origin: top right;
+}
+
+.arrow-1 {
+  animation: arrowMovement 2s ease-in-out infinite;
+}
+
+.arrow-2 {
+  animation: arrowMovement 2s 1s ease-in-out infinite;
+}
+
+@keyframes arrowMovement {
+  0% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  70% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+.about {
+  height: 100vh;
+  scroll-snap-align: start;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 100px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: relative;
+}
+
+.about::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
+}
+
 .contact {
   height: 100vh;
   scroll-snap-align: start;
@@ -220,6 +420,20 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  position: relative;
+}
+
+.contact::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.03) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: -1;
 }
 
 .section-title {
@@ -276,6 +490,12 @@ onUnmounted(() => {
 .skill-card:hover {
   border-color: var(--color-border-hover);
   transform: translateY(-2px);
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.skill-card:hover .skill-icon {
+  background: hsla(0, 0%, 100%, 0.1);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
 }
 
 .skill-icon {
@@ -334,6 +554,7 @@ onUnmounted(() => {
 .contact-item:hover {
   border-color: var(--color-border-hover);
   transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
 }
 
 .contact-icon {
