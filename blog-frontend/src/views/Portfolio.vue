@@ -49,6 +49,18 @@ import GridCanvas from '../components/GridCanvas.vue'
 
 const projects = [
   {
+    name: 'LinkPoink',
+    badge: '灵感商城',
+    description: '连接"拥有者"与"需求者"的创意与技能市场。让普通人将脑中的灵感、毕生经验、零碎知识转化为可保护、可定价、可交易的数字资产。半盲盒预览+数字权益卡确权机制，保护无形创意。',
+    features: [
+      '灵感货架：出售创意火花、经验直觉、知识心得',
+      '悬赏大厅：发布需求，平台用户接单完成',
+      '半盲盒预览：展示风格意向，隐藏核心细节',
+      '数字权益卡：时间戳哈希存证保护原创'
+    ],
+    stack: ['Spring Boot', 'Vue 3', 'MySQL', 'Redis']
+  },
+  {
     name: 'FuncFind',
     badge: 'RAG Web 导航',
     description: '基于 RAG 的网站功能定位与导航器。爬取网站、提取交互元素、构建向量知识库，自然语言驱动页面导航与元素高亮。可嵌入 Shadow DOM Widget，两行代码集成，零样式泄漏。',

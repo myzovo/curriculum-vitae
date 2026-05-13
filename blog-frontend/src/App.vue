@@ -7,16 +7,6 @@
           <router-link to="/blog">博客</router-link>
           <router-link to="/portfolio">作品集</router-link>
         </nav>
-        <div class="header-right">
-          <template v-if="user">
-            <span class="user-name">{{ user.username }}</span>
-            <button class="btn-header btn-outline" @click="logout">退出</button>
-          </template>
-          <template v-else>
-            <router-link class="btn-header btn-outline" to="/login">登录</router-link>
-            <router-link class="btn-header btn-solid" to="/register">注册</router-link>
-          </template>
-        </div>
         <button class="hamburger" @click="menuOpen = !menuOpen" aria-label="Menu">
           <span :class="{ open: menuOpen }"></span>
         </button>
@@ -26,14 +16,6 @@
           <router-link to="/" @click="menuOpen = false">首页</router-link>
           <router-link to="/blog" @click="menuOpen = false">博客</router-link>
           <router-link to="/portfolio" @click="menuOpen = false">作品集</router-link>
-          <template v-if="user">
-            <span class="mobile-user">{{ user.username }}</span>
-            <button class="btn-header btn-outline" @click="logout; menuOpen = false">退出</button>
-          </template>
-          <template v-else>
-            <router-link class="btn-header btn-outline" to="/login" @click="menuOpen = false">登录</router-link>
-            <router-link class="btn-header btn-solid" to="/register" @click="menuOpen = false">注册</router-link>
-          </template>
         </div>
       </transition>
     </header>
@@ -53,9 +35,8 @@
           <p class="footer-copy">&copy; {{ new Date().getFullYear() }} FeiTwnd. All rights reserved.</p>
         </div>
         <div class="footer-right">
-          <a href="https://github.com" target="_blank" rel="noreferrer">GitHub</a>
-          <a href="https://www.bilibili.com" target="_blank" rel="noreferrer">Bilibili</a>
-          <a href="https://leetcode.com" target="_blank" rel="noreferrer">LeetCode</a>
+          <a href="https://github.com/myzovo" target="_blank" rel="noreferrer">GitHub</a>
+          <a href="mailto:myzovo@qq.com">Email</a>
         </div>
       </div>
     </footer>
@@ -69,32 +50,18 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const isHome = computed(() => route.path === '/')
 const isScrolled = ref(false)
-const user = ref(null)
 const menuOpen = ref(false)
-
-const syncUser = () => {
-  const raw = localStorage.getItem('user')
-  user.value = raw ? JSON.parse(raw) : null
-}
-
-const logout = () => {
-  localStorage.removeItem('user')
-  syncUser()
-}
 
 const onScroll = () => {
   isScrolled.value = window.scrollY > 50
 }
 
 onMounted(() => {
-  syncUser()
   window.addEventListener('scroll', onScroll, { passive: true })
-  window.addEventListener('storage', syncUser)
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', onScroll)
-  window.removeEventListener('storage', syncUser)
 })
 </script>
 
@@ -299,52 +266,6 @@ a {
   color: #fff;
 }
 
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.user-name {
-  font-size: 14px;
-  color: hsla(0, 0%, 100%, 0.55);
-  font-weight: 500;
-}
-
-.btn-header {
-  padding: 8px 20px;
-  border-radius: 4px;
-  font-size: 13px;
-  font-weight: 500;
-  font-family: var(--font-primary);
-  cursor: pointer;
-  transition: all 0.3s var(--transition);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-}
-
-.btn-outline {
-  background: transparent;
-  border: 1px solid hsla(0, 0%, 100%, 0.3);
-  color: #fff;
-}
-
-.btn-outline:hover {
-  border-color: hsla(0, 0%, 100%, 0.6);
-  background: hsla(0, 0%, 100%, 0.05);
-}
-
-.btn-solid {
-  background: #fff;
-  border: 1px solid #fff;
-  color: #000;
-}
-
-.btn-solid:hover {
-  background: hsla(0, 0%, 100%, 0.9);
-}
-
 .hamburger {
   display: none;
   background: none;
@@ -412,11 +333,6 @@ a {
   font-size: 16px;
   color: hsla(0, 0%, 100%, 0.85);
   padding: 8px 0;
-}
-
-.mobile-user {
-  font-size: 14px;
-  color: hsla(0, 0%, 100%, 0.55);
 }
 
 .slide-enter-active,

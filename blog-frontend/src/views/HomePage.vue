@@ -93,10 +93,8 @@ const skills = [
 ]
 
 const contactLinks = [
-  { icon: '@', label: 'Email', href: 'mailto:hi@example.com' },
-  { icon: 'G', label: 'GitHub', href: 'https://github.com' },
-  { icon: 'B', label: 'Bilibili', href: 'https://www.bilibili.com' },
-  { icon: 'L', label: 'LeetCode', href: 'https://leetcode.com' }
+  { icon: '@', label: 'Email', href: 'mailto:myzovo@qq.com' },
+  { icon: 'G', label: 'GitHub', href: 'https://github.com/myzovo' }
 ]
 
 onMounted(() => {

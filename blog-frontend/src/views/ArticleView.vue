@@ -3,14 +3,6 @@
     <GridCanvas :speed="0.08" :squareSize="100" borderColor="rgba(255, 255, 255, 0.015)" />
     <div class="article-nav">
       <router-link class="back-link" to="/blog">← 返回博客</router-link>
-      <button
-        v-if="canDelete"
-        class="delete-btn"
-        :disabled="deleting"
-        @click="handleDelete"
-      >
-        {{ deleting ? '删除中...' : '删除文章' }}
-      </button>
     </div>
 
     <div v-if="loading" class="skeleton-wrap">
@@ -33,30 +25,16 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { getArticle, deleteArticle } from '../utils/api'
+import { ref, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
+import { getArticle } from '../utils/api'
 import GridCanvas from '../components/GridCanvas.vue'
 
 const route = useRoute()
-const router = useRouter()
 
 const article = ref({})
 const loading = ref(false)
 const error = ref('')
-const deleting = ref(false)
-
-const currentUser = computed(() => {
-  const raw = localStorage.getItem('user')
-  return raw ? JSON.parse(raw) : null
-})
-
-const canDelete = computed(() => {
-  const user = currentUser.value
-  if (!user) return false
-  const authorId = article.value?.authorId
-  return Number(user.id) === Number(authorId) || Number(user.role) === 1
-})
 
 const formatDate = (val) => {
   if (!val) return ''
@@ -76,19 +54,6 @@ const fetchArticle = async () => {
   }
 }
 
-const handleDelete = async () => {
-  if (!confirm('确定删除该文章吗？')) return
-  deleting.value = true
-  try {
-    await deleteArticle(route.params.id)
-    router.replace('/blog')
-  } catch (e) {
-    alert(e.message || '删除失败')
-  } finally {
-    deleting.value = false
-  }
-}
-
 onMounted(() => fetchArticle())
 </script>
 
@@ -101,9 +66,6 @@ onMounted(() => fetchArticle())
 }
 
 .article-nav {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
   margin-bottom: 32px;
 }
 
@@ -116,29 +78,6 @@ onMounted(() => fetchArticle())
 
 .back-link:hover {
   color: #fff;
-}
-
-.delete-btn {
-  padding: 8px 20px;
-  background: transparent;
-  border: 1px solid var(--color-danger);
-  border-radius: 4px;
-  color: var(--color-danger);
-  font-size: 13px;
-  font-weight: 500;
-  font-family: var(--font-primary);
-  cursor: pointer;
-  transition: all 0.3s var(--transition);
-}
-
-.delete-btn:hover:not(:disabled) {
-  background: var(--color-danger);
-  color: #fff;
-}
-
-.delete-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .article-meta {

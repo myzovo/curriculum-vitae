@@ -27,7 +27,3 @@ export const getArticle = (id) => api.get(`/articles/${id}`)
 export const getCategories = () => api.get('/categories')
 
 export const deleteArticle = (id) => api.delete(`/articles/${id}`)
-
-export const register = (payload) => api.post('/auth/register', payload)
-
-export const login = (payload) => api.post('/auth/login', payload)
