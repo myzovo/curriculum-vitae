@@ -110,11 +110,15 @@ onUnmounted(() => {
 
 <style scoped>
 .home-page {
-  padding-top: var(--header-height);
+  height: 100vh;
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
 }
 
 .hero {
-  min-height: calc(100vh - var(--header-height));
+  height: 100vh;
+  scroll-snap-align: start;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -208,9 +212,14 @@ onUnmounted(() => {
 
 .about,
 .contact {
+  height: 100vh;
+  scroll-snap-align: start;
   max-width: var(--max-width);
   margin: 0 auto;
   padding: 100px 24px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .section-title {

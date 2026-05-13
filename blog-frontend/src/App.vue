@@ -1,8 +1,7 @@
 <template>
-  <div class="app-shell">
+  <div class="app-shell" :class="{ 'is-home': isHome }">
     <header class="site-header" :class="{ scrolled: isScrolled }">
       <div class="header-inner">
-        <router-link class="logo" to="/">FeiTwnd</router-link>
         <nav class="nav-links">
           <router-link to="/">首页</router-link>
           <router-link to="/blog">博客</router-link>
@@ -39,11 +38,13 @@
       </transition>
     </header>
 
-    <router-view v-slot="{ Component }">
-      <transition name="page" mode="out-in">
-        <component :is="Component" />
-      </transition>
-    </router-view>
+    <main class="main-content">
+      <router-view v-slot="{ Component }">
+        <transition name="page" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
+    </main>
 
     <footer class="site-footer">
       <div class="footer-inner">
@@ -62,8 +63,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRoute } from 'vue-router'
 
+const route = useRoute()
+const isHome = computed(() => route.path === '/')
 const isScrolled = ref(false)
 const user = ref(null)
 const menuOpen = ref(false)
@@ -209,6 +213,25 @@ a {
   flex-direction: column;
 }
 
+.app-shell.is-home {
+  height: 100vh;
+  overflow: hidden;
+}
+
+.app-shell.is-home .site-footer {
+  display: none;
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-shell.is-home .main-content {
+  overflow: hidden;
+}
+
 .site-header {
   position: fixed;
   top: 0;
@@ -233,14 +256,6 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.logo {
-  font-size: 20px;
-  font-weight: 700;
-  color: #fff;
-  letter-spacing: -0.02em;
-  text-decoration: none;
 }
 
 .nav-links {
