@@ -31,8 +31,8 @@
     <footer class="site-footer">
       <div class="footer-inner">
         <div class="footer-left">
-          <span class="footer-logo">FeiTwnd</span>
-          <p class="footer-copy">&copy; {{ new Date().getFullYear() }} FeiTwnd. All rights reserved.</p>
+          <span class="footer-logo">Yovozm</span>
+          <p class="footer-copy">&copy; {{ new Date().getFullYear() }} Yovozm. All rights reserved.</p>
         </div>
         <div class="footer-right">
           <a href="https://github.com/myzovo" target="_blank" rel="noreferrer">GitHub</a>

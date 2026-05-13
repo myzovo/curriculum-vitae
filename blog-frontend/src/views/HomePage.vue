@@ -4,7 +4,7 @@
       <canvas ref="gridCanvas" class="fluid-canvas"></canvas>
       <div class="hero-vignette"></div>
       <div class="hero-content">
-        <p class="hero-eyebrow">全栈开发者 / AI 爱好者</p>
+        <p class="hero-eyebrow">全栈开发者 / AI 应用开发</p>
         <h1 class="hero-name" ref="heroNameRef">
           <span v-for="(char, i) in nameChars" :key="i" class="name-char" :style="{ animationDelay: `${i * 0.08}s` }">{{ char }}</span>
         </h1>
@@ -33,7 +33,42 @@
           :class="{ visible: aboutVisible }"
           :style="{ transitionDelay: `${i * 80}ms` }"
         >
-          <div class="skill-icon">{{ skill.icon }}</div>
+          <div class="skill-icon" :style="{ '--brand-color': skill.color }">
+            <svg v-if="skill.type === 'spring'" viewBox="0 0 24 24" width="28" height="28" fill="none">
+              <path d="M21.854 8.646a5.96 5.96 0 0 0-4.293-5.262 5.97 5.97 0 0 0-6.478 1.389c-.283.283-.53.6-.743.941-.213-.34-.46-.658-.743-.941a5.97 5.97 0 0 0-6.478-1.39A5.96 5.96 0 0 0 .073 8.7C.96 13.977 5.23 18.22 12 22c6.77-3.78 11.04-8.023 11.927-13.3a5.93 5.93 0 0 0-.073-.054z" fill="currentColor"/>
+            </svg>
+            <svg v-else-if="skill.type === 'vue'" viewBox="0 0 24 24" width="28" height="28">
+              <path d="M2 3h3.5L12 14.5 18.5 3H22L12 21 2 3z" fill="currentColor"/>
+              <path d="M7.5 3L12 11 16.5 3H14L12 6.5 10 3H7.5z" fill="rgba(0,0,0,0.3)"/>
+            </svg>
+            <svg v-else-if="skill.type === 'kotlin'" viewBox="0 0 24 24" width="28" height="28">
+              <path d="M2 2h20L12 12l10 10H2V2z" fill="currentColor"/>
+              <path d="M5.5 5.5l6.5 6.5-6.5 6.5V5.5z" fill="rgba(255,255,255,0.5)"/>
+            </svg>
+            <svg v-else-if="skill.type === 'python'" viewBox="0 0 24 24" width="28" height="28" fill="none">
+              <path d="M12 2C9.24 2 7.47 3.17 7.47 5.24V7h4.86v.56H5.38C3.14 7.56 1.4 9.53 1.4 12.28c0 2.74 1.53 4.62 3.98 4.62h1.62V14.8c0-2.16 1.87-4.04 4.04-4.04h4.86c1.76 0 3.16-1.42 3.16-3.16V5.24C19.06 3.17 17.28 2 12 2zm-2.62 1.83a.95.95 0 1 1 0 1.9.95.95 0 0 1 0-1.9z" fill="#3776AB"/>
+              <path d="M12 22c2.76 0 4.53-1.17 4.53-3.24V16.2H11.67v-.56h6.89c2.24 0 3.98-1.97 3.98-4.72 0-2.74-1.53-4.62-3.98-4.62h-1.62v2.11c0 2.16-1.87 4.04-4.04 4.04H8.54c-1.76 0-3.16 1.42-3.16 3.16v2.53C5.38 20.83 7.16 22 12 22zm2.62-1.83a.95.95 0 1 1 0-1.9.95.95 0 0 1 0 1.9z" fill="#FFD43B"/>
+            </svg>
+            <svg v-else-if="skill.type === 'mysql'" viewBox="0 0 24 24" width="28" height="28" fill="none">
+              <ellipse cx="12" cy="6" rx="9" ry="3.5" fill="currentColor"/>
+              <path d="M3 6v5c0 1.93 4.03 3.5 9 3.5s9-1.57 9-3.5V6" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <path d="M3 11v5c0 1.93 4.03 3.5 9 3.5s9-1.57 9-3.5v-5" stroke="currentColor" stroke-width="1.5" fill="none"/>
+            </svg>
+            <svg v-else-if="skill.type === 'redis'" viewBox="0 0 24 24" width="28" height="28" fill="none">
+              <path d="M12 2L3 7v10l9 5 9-5V7l-9-5z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+              <path d="M12 2v20M3 7l9 5 9-5M3 17l9-5 9 5" stroke="currentColor" stroke-width="1.2" opacity="0.5"/>
+              <circle cx="12" cy="12" r="2.5" fill="currentColor"/>
+            </svg>
+            <svg v-else-if="skill.type === 'cloudflare'" viewBox="0 0 24 24" width="28" height="28" fill="none">
+              <path d="M16.5 18h-9a1.5 1.5 0 0 1 0-3h.24a5.5 5.5 0 0 1 10.52 0h.24a1.5 1.5 0 0 1 0 3z" fill="currentColor" opacity="0.25"/>
+              <path d="M18.5 14.5a4 4 0 0 0-3.87-3.02A5.5 5.5 0 0 0 5 13.5H3.5a2.5 2.5 0 0 0-.47 4.97A2 2 0 0 0 5 18h11.5a2 2 0 0 0 2-2v-.5z" fill="currentColor"/>
+            </svg>
+            <svg v-else-if="skill.type === 'playwright'" viewBox="0 0 24 24" width="28" height="28" fill="none">
+              <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <text x="12" y="16" text-anchor="middle" fill="currentColor" font-size="12" font-weight="700" font-family="sans-serif">P</text>
+            </svg>
+          </div>
           <h3 class="skill-name">{{ skill.name }}</h3>
           <p class="skill-desc">{{ skill.desc }}</p>
         </div>
@@ -77,19 +112,19 @@ const heroBioRef = ref(null)
 let observer = null
 let snake = null
 
-const bioText = '热爱技术，专注于构建高质量的全栈应用。探索 AI、RAG、云原生等前沿技术，用代码创造价值。'
+const bioText = '欢迎，这是个记录折腾过程的地方'
 const bioChars = computed(() => [...bioText])
-const nameChars = computed(() => [...'FeiTwnd'])
+const nameChars = computed(() => [...'ZhuYiming'])
 
 const skills = [
-  { icon: 'S', name: 'Spring Boot', desc: '企业级 Java 后端框架' },
-  { icon: 'V', name: 'Vue 3', desc: '现代前端渐进式框架' },
-  { icon: 'K', name: 'Kotlin', desc: 'Android 与服务端开发' },
-  { icon: 'P', name: 'Python', desc: '数据处理与 AI 脚本' },
-  { icon: 'M', name: 'MySQL', desc: '关系型数据库设计' },
-  { icon: 'R', name: 'Redis', desc: '高性能缓存与消息队列' },
-  { icon: 'C', name: 'Cloudflare', desc: '边缘计算与 CDN' },
-  { icon: 'W', name: 'Playwright', desc: '浏览器自动化与爬虫' }
+  { name: 'Spring Boot', desc: '企业级 Java 后端框架', color: '#6DB33F', type: 'spring' },
+  { name: 'Vue 3', desc: '现代前端渐进式框架', color: '#42B883', type: 'vue' },
+  { name: 'Kotlin', desc: 'Android 与服务端开发', color: '#7F52FF', type: 'kotlin' },
+  { name: 'Python', desc: '数据处理与 AI 脚本', color: '#3776AB', type: 'python' },
+  { name: 'MySQL', desc: '关系型数据库设计', color: '#4479A1', type: 'mysql' },
+  { name: 'Redis', desc: '高性能缓存与消息队列', color: '#DC382D', type: 'redis' },
+  { name: 'Cloudflare', desc: '边缘计算与 CDN', color: '#F38020', type: 'cloudflare' },
+  { name: 'Playwright', desc: '浏览器自动化与爬虫', color: '#2EAD33', type: 'playwright' }
 ]
 
 const contactLinks = [
@@ -495,8 +530,10 @@ onUnmounted(() => {
 }
 
 .skill-card:hover .skill-icon {
-  background: hsla(0, 0%, 100%, 0.1);
-  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+  background: color-mix(in srgb, var(--brand-color) 15%, transparent);
+  border-color: color-mix(in srgb, var(--brand-color) 40%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--brand-color) 25%, transparent);
+  color: var(--brand-color);
 }
 
 .skill-icon {
@@ -508,10 +545,9 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 20px;
-  font-weight: 700;
-  color: #fff;
+  color: hsla(0, 0%, 100%, 0.65);
   margin-bottom: 16px;
+  transition: all 0.3s var(--transition);
 }
 
 .skill-name {

@@ -1,50 +1,57 @@
 <template>
   <div class="portfolio-page">
     <GridCanvas :speed="0.1" :squareSize="70" borderColor="rgba(255, 255, 255, 0.025)" />
-    <section class="portfolio-hero">
-      <h1 class="portfolio-title">作品集</h1>
-      <p class="portfolio-subtitle">探索我的项目</p>
-    </section>
+    <aside class="portfolio-sidebar">
+      <h1 class="sidebar-title">作品集</h1>
+      <p class="sidebar-subtitle">内容可能包含：半成品项目、未经验证的观点，以及偶尔闪现的好想法。欢迎手动过滤</p>
+      <nav class="project-nav">
+        <a
+          v-for="(project, index) in projects"
+          :key="project.name"
+          class="nav-item"
+          :class="{ active: activeIndex === index }"
+          @click="activeIndex = index"
+        >
+          <span class="nav-dot"></span>
+          <span class="nav-label">{{ project.name }}</span>
+          <span class="nav-badge">{{ project.badge }}</span>
+        </a>
+      </nav>
+    </aside>
 
-    <section class="portfolio-grid">
-      <article
-        v-for="(project, index) in projects"
-        :key="project.name"
-        class="project-card"
-        :class="{ visible: visibleCards.has(index) }"
-        :style="{ transitionDelay: `${index * 100}ms` }"
-      >
-        <div class="card-visual">
-          <div class="card-icon">
-            <span class="icon-letter">{{ project.name.charAt(0) }}</span>
+    <main ref="mainRef" class="portfolio-main">
+      <transition name="slide-fade" mode="out-in">
+        <article :key="activeIndex" class="project-detail">
+          <div class="detail-header">
+            <div class="detail-icon">
+              <span class="icon-letter">{{ current.name.charAt(0) }}</span>
+            </div>
+            <div>
+              <h2 class="detail-name">{{ current.name }}</h2>
+              <span class="detail-badge">{{ current.badge }}</span>
+            </div>
           </div>
-        </div>
 
-        <div class="card-body">
-          <div class="card-header">
-            <h2 class="project-name">{{ project.name }}</h2>
-            <span class="project-badge">{{ project.badge }}</span>
-          </div>
-          <p class="project-desc">{{ project.description }}</p>
+          <p class="detail-desc">{{ current.description }}</p>
 
-          <ul class="project-features">
-            <li v-for="feature in project.features" :key="feature">
+          <ul class="detail-features">
+            <li v-for="feature in current.features" :key="feature">
               <span class="feature-dot"></span>
               {{ feature }}
             </li>
           </ul>
 
-          <div class="tech-stack">
-            <span v-for="tag in project.stack" :key="tag" class="tech-tag">{{ tag }}</span>
+          <div class="detail-stack">
+            <span v-for="tag in current.stack" :key="tag" class="tech-tag">{{ tag }}</span>
           </div>
-        </div>
-      </article>
-    </section>
+        </article>
+      </transition>
+    </main>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import GridCanvas from '../components/GridCanvas.vue'
 
 const projects = [
@@ -85,18 +92,6 @@ const projects = [
     stack: ['Spring Boot', 'Vue 3', 'Cloudflare Vectorize', 'R2']
   },
   {
-    name: 'Website Link Discoverer',
-    badge: '网站探索器',
-    description: '基于 Crawlee + Playwright 的网站探索工具。发现所有交互入口（链接、按钮、表单），输出结构化 sitemap.json，包含 XPath 和语义上下文，内置安全过滤。',
-    features: [
-      '自动发现所有交互入口',
-      '结构化 JSON 输出（XPath + 语义上下文）',
-      '内置危险操作安全过滤',
-      '支持 CLI 与 Web UI 两种模式'
-    ],
-    stack: ['Node.js', 'Crawlee', 'Playwright']
-  },
-  {
     name: 'Cloud Attendance Assistant',
     badge: '微信小程序',
     description: '微信小程序员工考勤系统。实时地理围栏（Haversine 距离检测），TOTP 管理员验证（兼容 Google Authenticator），离线 Mock OpenID 优雅降级。',
@@ -119,260 +114,351 @@ const projects = [
       '多模型路由（DeepSeek / 智谱 AI）'
     ],
     stack: ['Kotlin', 'Spring Boot', 'Supabase', 'pgvector', 'DeepSeek']
+  },
+  {
+    name: 'Website Link Discoverer',
+    badge: '网站探索器',
+    description: '基于 Crawlee + Playwright 的网站探索工具。发现所有交互入口（链接、按钮、表单），输出结构化 sitemap.json，包含 XPath 和语义上下文，内置安全过滤。',
+    features: [
+      '自动发现所有交互入口',
+      '结构化 JSON 输出（XPath + 语义上下文）',
+      '内置危险操作安全过滤',
+      '支持 CLI 与 Web UI 两种模式'
+    ],
+    stack: ['Node.js', 'Crawlee', 'Playwright']
   }
 ]
 
-const visibleCards = ref(new Set())
-let observer = null
+const activeIndex = ref(0)
+const current = computed(() => projects[activeIndex.value])
+const mainRef = ref(null)
+
+let scrollCooldown = false
+
+const onWheel = (e) => {
+  e.preventDefault()
+  if (scrollCooldown) return
+  if (Math.abs(e.deltaY) < 30) return
+  scrollCooldown = true
+  setTimeout(() => { scrollCooldown = false }, 600)
+
+  if (e.deltaY > 0 && activeIndex.value < projects.length - 1) {
+    activeIndex.value++
+  } else if (e.deltaY < 0 && activeIndex.value > 0) {
+    activeIndex.value--
+  }
+}
 
 onMounted(() => {
-  observer = new IntersectionObserver(
-    (entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          const index = Number(entry.target.dataset.index)
-          visibleCards.value = new Set([...visibleCards.value, index])
-          observer.unobserve(entry.target)
-        }
-      })
-    },
-    { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-  )
-
-  const cards = document.querySelectorAll('.project-card')
-  cards.forEach((card, i) => {
-    card.dataset.index = i
-    observer.observe(card)
-  })
+  mainRef.value?.addEventListener('wheel', onWheel, { passive: false })
 })
 
 onUnmounted(() => {
-  if (observer) observer.disconnect()
+  mainRef.value?.removeEventListener('wheel', onWheel)
 })
 </script>
 
 <style scoped>
 .portfolio-page {
-  max-width: var(--max-width);
-  margin: 0 auto;
-  padding: calc(var(--header-height) + 60px) 24px 80px;
+  display: flex;
   min-height: 100vh;
+  padding-top: var(--header-height);
 }
 
-.portfolio-hero {
-  text-align: center;
-  margin-bottom: 64px;
+.portfolio-sidebar {
+  position: fixed;
+  top: var(--header-height);
+  left: 0;
+  bottom: 0;
+  width: 320px;
+  padding: 48px 32px 48px 40px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  z-index: 10;
 }
 
-.portfolio-title {
-  font-size: 48px;
+.sidebar-title {
+  font-size: 28px;
   font-weight: 700;
   color: #fff;
   letter-spacing: -0.02em;
-  line-height: 1.2;
-  background: linear-gradient(135deg, #fff 0%, hsla(0, 0%, 100%, 0.7) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
   margin-bottom: 12px;
 }
 
-.portfolio-subtitle {
-  font-size: 18px;
-  color: hsla(0, 0%, 100%, 0.55);
+.sidebar-subtitle {
+  font-size: 13px;
+  color: hsla(0, 0%, 100%, 0.4);
+  line-height: 1.7;
+  margin-bottom: 40px;
 }
 
-.portfolio-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-}
-
-.project-card {
-  background: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius);
-  overflow: hidden;
+.project-nav {
   display: flex;
   flex-direction: column;
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.6s var(--transition),
-              transform 0.6s var(--transition),
-              border-color 0.3s var(--transition),
-              box-shadow 0.3s var(--transition);
+  gap: 4px;
 }
 
-.project-card.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.project-card:hover {
-  border-color: hsla(0, 0%, 100%, 0.25);
-  box-shadow: 0 0 20px rgba(255, 255, 255, 0.05), 0 8px 32px rgba(0, 0, 0, 0.4);
-}
-
-.project-card:hover .card-visual {
-  transform: scale(1.02);
-}
-
-.card-visual {
-  height: 180px;
-  background: linear-gradient(135deg, #1a1a1a 0%, #0d0d0d 100%);
+.nav-item {
   display: flex;
   align-items: center;
-  justify-content: center;
-  transition: transform 0.3s var(--transition);
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s var(--transition);
+  text-decoration: none;
   position: relative;
+}
+
+.nav-item:hover {
+  background: hsla(0, 0%, 100%, 0.04);
+}
+
+.nav-item.active {
+  background: hsla(0, 0%, 100%, 0.06);
+}
+
+.nav-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: hsla(0, 0%, 100%, 0.2);
+  flex-shrink: 0;
+  transition: all 0.3s var(--transition);
+}
+
+.nav-item.active .nav-dot {
+  background: var(--color-accent);
+  box-shadow: 0 0 8px hsla(160, 84%, 39%, 0.5);
+}
+
+.nav-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: hsla(0, 0%, 100%, 0.55);
+  flex: 1;
+  transition: color 0.3s var(--transition);
+}
+
+.nav-item.active .nav-label {
+  color: #fff;
+}
+
+.nav-item:hover .nav-label {
+  color: hsla(0, 0%, 100%, 0.85);
+}
+
+.nav-badge {
+  font-size: 11px;
+  color: hsla(0, 0%, 100%, 0.3);
+  background: hsla(0, 0%, 100%, 0.04);
+  padding: 2px 8px;
+  border-radius: 999px;
+  transition: all 0.3s var(--transition);
+}
+
+.nav-item.active .nav-badge {
+  color: hsla(0, 0%, 100%, 0.6);
+  background: hsla(0, 0%, 100%, 0.08);
+}
+
+.portfolio-main {
+  flex: 1;
+  margin-left: 320px;
+  padding: 60px 60px 80px 60px;
+  display: flex;
+  align-items: center;
   overflow: hidden;
 }
 
-.card-visual::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(circle at 30% 50%, hsla(0, 0%, 100%, 0.03) 0%, transparent 70%);
+.project-detail {
+  max-width: 720px;
+  width: 100%;
 }
 
-.card-icon {
-  width: 72px;
-  height: 72px;
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 32px;
+}
+
+.detail-icon {
+  width: 64px;
+  height: 64px;
   border-radius: 16px;
   background: hsla(0, 0%, 100%, 0.06);
   border: 1px solid hsla(0, 0%, 100%, 0.1);
   display: flex;
   align-items: center;
   justify-content: center;
-  position: relative;
-  z-index: 1;
+  flex-shrink: 0;
 }
 
 .icon-letter {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 700;
   color: #fff;
 }
 
-.card-body {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  flex: 1;
-}
-
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.project-name {
-  font-size: 20px;
-  font-weight: 600;
+.detail-name {
+  font-size: 32px;
+  font-weight: 700;
   color: #fff;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
 }
 
-.project-badge {
-  flex-shrink: 0;
-  background: hsla(0, 0%, 100%, 0.08);
-  color: hsla(0, 0%, 100%, 0.75);
-  padding: 4px 12px;
-  border-radius: 999px;
+.detail-badge {
   font-size: 12px;
-  font-weight: 500;
-  border: 1px solid hsla(0, 0%, 100%, 0.08);
+  color: var(--color-accent);
+  background: hsla(160, 84%, 39%, 0.1);
+  padding: 3px 12px;
+  border-radius: 999px;
 }
 
-.project-desc {
-  font-size: 14px;
-  line-height: 1.7;
+.detail-desc {
+  font-size: 16px;
+  line-height: 1.8;
   color: hsla(0, 0%, 100%, 0.85);
+  margin-bottom: 32px;
 }
 
-.project-features {
+.detail-features {
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
+  margin-bottom: 36px;
 }
 
-.project-features li {
+.detail-features li {
   display: flex;
   align-items: center;
-  gap: 10px;
-  font-size: 13px;
-  color: hsla(0, 0%, 100%, 0.55);
-  line-height: 1.5;
+  gap: 12px;
+  font-size: 14px;
+  color: hsla(0, 0%, 100%, 0.65);
+  line-height: 1.6;
 }
 
 .feature-dot {
-  width: 4px;
-  height: 4px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  background: hsla(0, 0%, 100%, 0.35);
+  background: hsla(0, 0%, 100%, 0.3);
   flex-shrink: 0;
 }
 
-.tech-stack {
+.detail-stack {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin-top: auto;
-  padding-top: 4px;
 }
 
 .tech-tag {
   background: hsla(0, 0%, 100%, 0.06);
   color: hsla(0, 0%, 100%, 0.55);
-  padding: 4px 12px;
+  padding: 5px 14px;
   border-radius: 999px;
   font-size: 12px;
   font-weight: 500;
   border: 1px solid hsla(0, 0%, 100%, 0.06);
-  transition: background 0.3s var(--transition), color 0.3s var(--transition);
 }
 
-.project-card:hover .tech-tag {
-  background: hsla(0, 0%, 100%, 0.1);
-  color: hsla(0, 0%, 100%, 0.85);
+/* Transition */
+.slide-fade-enter-active {
+  transition: all 0.4s var(--transition);
+}
+
+.slide-fade-leave-active {
+  transition: all 0.2s var(--transition);
+}
+
+.slide-fade-enter-from {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.slide-fade-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+}
+
+@media (max-width: 1024px) {
+  .portfolio-sidebar {
+    width: 260px;
+    padding: 36px 24px 36px 28px;
+  }
+
+  .portfolio-main {
+    margin-left: 260px;
+    padding: 40px 32px 60px;
+  }
 }
 
 @media (max-width: 768px) {
   .portfolio-page {
-    padding: calc(var(--header-height) + 40px) 16px 60px;
-  }
-
-  .portfolio-title {
-    font-size: 36px;
-  }
-
-  .portfolio-subtitle {
-    font-size: 16px;
-  }
-
-  .portfolio-grid {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .card-visual {
-    height: 140px;
-  }
-}
-
-@media (max-width: 480px) {
-  .portfolio-title {
-    font-size: 28px;
-  }
-
-  .card-header {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
+  }
+
+  .portfolio-sidebar {
+    position: relative;
+    top: 0;
+    width: 100%;
+    padding: 24px 16px 0;
+    max-height: none;
+    overflow-y: visible;
+  }
+
+  .sidebar-subtitle {
+    margin-bottom: 20px;
+  }
+
+  .project-nav {
+    flex-direction: row;
+    overflow-x: auto;
+    gap: 0;
+    padding-bottom: 16px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .nav-item {
+    white-space: nowrap;
+    padding: 10px 14px;
+  }
+
+  .nav-badge {
+    display: none;
+  }
+
+  .portfolio-main {
+    margin-left: 0;
+    padding: 24px 16px 60px;
+    overflow: hidden;
+  }
+
+  .detail-header {
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .detail-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+  }
+
+  .icon-letter {
+    font-size: 20px;
+  }
+
+  .detail-name {
+    font-size: 24px;
+  }
+
+  .detail-desc {
+    font-size: 15px;
   }
 }
 </style>
