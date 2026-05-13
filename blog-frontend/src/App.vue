@@ -5,6 +5,7 @@
         <nav class="nav-links">
           <router-link to="/">首页</router-link>
           <router-link to="/blog">博客</router-link>
+          <router-link to="/ai-tools">AI工具集</router-link>
           <router-link to="/portfolio">作品集</router-link>
         </nav>
         <button class="hamburger" @click="menuOpen = !menuOpen" aria-label="Menu">
@@ -15,6 +16,7 @@
         <div v-if="menuOpen" class="mobile-menu">
           <router-link to="/" @click="menuOpen = false">首页</router-link>
           <router-link to="/blog" @click="menuOpen = false">博客</router-link>
+          <router-link to="/ai-tools" @click="menuOpen = false">AI工具集</router-link>
           <router-link to="/portfolio" @click="menuOpen = false">作品集</router-link>
         </div>
       </transition>

@@ -68,6 +68,40 @@
               <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/>
               <text x="12" y="16" text-anchor="middle" fill="currentColor" font-size="12" font-weight="700" font-family="sans-serif">P</text>
             </svg>
+            <svg v-else-if="skill.type === 'arkts'" viewBox="0 0 24 24" width="28" height="28" fill="none">
+              <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <text x="12" y="16" text-anchor="middle" fill="currentColor" font-size="11" font-weight="700" font-family="sans-serif">A</text>
+            </svg>
+            <svg v-else-if="skill.type === 'cpp'" viewBox="0 0 24 24" width="28" height="28" fill="none">
+              <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <text x="12" y="16.5" text-anchor="middle" fill="currentColor" font-size="9.5" font-weight="700" font-family="sans-serif">C++</text>
+            </svg>
+            <svg v-else-if="skill.type === 'linux'" viewBox="0 0 24 24" width="28" height="28" fill="none">
+              <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <text x="12" y="16" text-anchor="middle" fill="currentColor" font-size="8" font-weight="700" font-family="monospace">&gt;_</text>
+            </svg>
+            <svg v-else-if="skill.type === 'docker'" viewBox="0 0 24 24" width="28" height="28" fill="none">
+              <rect x="2" y="9" width="4" height="3" rx="0.5" fill="currentColor"/>
+              <rect x="7" y="9" width="4" height="3" rx="0.5" fill="currentColor"/>
+              <rect x="12" y="9" width="4" height="3" rx="0.5" fill="currentColor"/>
+              <rect x="7" y="5" width="4" height="3" rx="0.5" fill="currentColor"/>
+              <rect x="12" y="5" width="4" height="3" rx="0.5" fill="currentColor"/>
+              <path d="M1 14c0 0 2 5 11 5s12-5 12-5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            </svg>
+            <svg v-else-if="skill.type === 'git'" viewBox="0 0 24 24" width="28" height="28" fill="none">
+              <circle cx="12" cy="12" r="10" fill="currentColor" opacity="0.15"/>
+              <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="1.5" fill="none"/>
+              <circle cx="12" cy="8" r="2" fill="currentColor"/>
+              <circle cx="12" cy="16" r="2" fill="currentColor"/>
+              <line x1="12" y1="10" x2="12" y2="14" stroke="currentColor" stroke-width="1.5"/>
+            </svg>
+            <svg v-else-if="skill.type === 'wechat'" viewBox="0 0 24 24" width="28" height="28" fill="none">
+              <path d="M9.5 4C5.91 4 3 6.46 3 9.5c0 1.7.86 3.22 2.2 4.24L4.5 16l2.5-1.2c.8.3 1.68.46 2.58.46.17 0 .33 0 .5-.02A5.48 5.48 0 0 1 10 13.5C10 10.46 12.46 8 15.5 8c.45 0 .88.05 1.3.14C15.9 5.64 13 4 9.5 4z" fill="currentColor"/>
+              <path d="M21 13.5c0-2.76-2.69-5-6-5s-6 2.24-6 5 2.69 5 6 5c.67 0 1.31-.1 1.9-.28L20 19.5l-.65-2.08C20.44 16.49 21 15.06 21 13.5z" fill="currentColor" opacity="0.6"/>
+            </svg>
           </div>
           <h3 class="skill-name">{{ skill.name }}</h3>
           <p class="skill-desc">{{ skill.desc }}</p>
@@ -124,7 +158,13 @@ const skills = [
   { name: 'MySQL', desc: '关系型数据库设计', color: '#4479A1', type: 'mysql' },
   { name: 'Redis', desc: '高性能缓存与消息队列', color: '#DC382D', type: 'redis' },
   { name: 'Cloudflare', desc: '边缘计算与 CDN', color: '#F38020', type: 'cloudflare' },
-  { name: 'Playwright', desc: '浏览器自动化与爬虫', color: '#2EAD33', type: 'playwright' }
+  { name: 'Playwright', desc: '浏览器自动化与爬虫', color: '#2EAD33', type: 'playwright' },
+  { name: 'ArkTS', desc: 'HarmonyOS 应用开发', color: '#CE392D', type: 'arkts' },
+  { name: '微信小程序', desc: '轻量级移动端应用', color: '#07C160', type: 'wechat' },
+  { name: 'C / C++', desc: '系统编程与高性能计算', color: '#00599C', type: 'cpp' },
+  { name: 'Linux', desc: '了解常用 Linux 命令', color: '#FCC624', type: 'linux' },
+  { name: 'Docker', desc: '了解 Docker 工作原理及部署', color: '#2496ED', type: 'docker' },
+  { name: 'Git', desc: '熟悉 Git 版本管理', color: '#F05032', type: 'git' }
 ]
 
 const contactLinks = [
@@ -427,7 +467,7 @@ onUnmounted(() => {
   scroll-snap-align: start;
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 100px 24px;
+  padding: 80px 24px;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -505,14 +545,14 @@ onUnmounted(() => {
 .skills-grid {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  gap: 12px;
 }
 
 .skill-card {
   background: var(--color-surface);
   border: 1px solid var(--color-border);
   border-radius: var(--radius);
-  padding: 28px 24px;
+  padding: 20px 20px;
   transition: all 0.6s var(--transition);
   opacity: 0;
   transform: translateY(20px);
@@ -537,16 +577,16 @@ onUnmounted(() => {
 }
 
 .skill-icon {
-  width: 48px;
-  height: 48px;
-  border-radius: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
   background: hsla(0, 0%, 100%, 0.06);
   border: 1px solid hsla(0, 0%, 100%, 0.08);
   display: flex;
   align-items: center;
   justify-content: center;
   color: hsla(0, 0%, 100%, 0.65);
-  margin-bottom: 16px;
+  margin-bottom: 12px;
   transition: all 0.3s var(--transition);
 }
 

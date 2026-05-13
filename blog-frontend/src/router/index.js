@@ -17,6 +17,11 @@ const routes = [
     component: () => import('@/views/ArticleView.vue')
   },
   {
+    path: '/ai-tools',
+    name: 'AiTools',
+    component: () => import('@/views/AiTools.vue')
+  },
+  {
     path: '/portfolio',
     name: 'Portfolio',
     component: () => import('@/views/Portfolio.vue')
